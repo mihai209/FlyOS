@@ -1,7 +1,7 @@
 {
   "name": "flyos",
   "scripts": {
-   "all" : ""
+   "all" : "make clean ; make ; make run"
   },
   "license": "MIT"
 }

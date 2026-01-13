@@ -4,7 +4,7 @@ ASM      = nasm
 ASMFLAGS = -f bin
 
 # Bootloader stages in order. These are concatenated into the final image.
-BOOT_STAGES_ASM = mbr.asm stage1.asm
+BOOT_STAGES_ASM = boot.asm stage1.asm
 BOOT_STAGES_BIN = $(patsubst %.asm,%.bin,$(BOOT_STAGES_ASM))
 
 # Other ASM files that are compiled but not part of the boot image

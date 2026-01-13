@@ -1,25 +1,25 @@
-# FlyOS - MBR Makefile
-# ASM ONLY
+# FlyOS - Makefile
 
-ASM     = nasm
-ASMFLAGS= -f bin
+ASM      = nasm
+ASMFLAGS = -f bin
 
-TARGET  = mbr.bin
-SRC     = mbr.asm
+.PHONY: all run clean
 
-.PHONY: all run clean size
+all: flyos.img
 
-all: $(TARGET)
+mbr.bin: mbr.asm
+	$(ASM) $(ASMFLAGS) mbr.asm -o mbr.bin
 
-$(TARGET): $(SRC)
-	$(ASM) $(ASMFLAGS) $(SRC) -o $(TARGET)
+stage1.bin: stage1.asm
+	$(ASM) $(ASMFLAGS) stage1.asm -o stage1.bin
 
-run: $(TARGET)
-	qemu-system-i386 -drive format=raw,file=$(TARGET)
+flyos.img: mbr.bin stage1.bin
+	cat mbr.bin stage1.bin > flyos.img
 
-size: $(TARGET)
-	@echo "MBR size:"
-	@stat -c %s $(TARGET)
+run: flyos.img
+	@echo "Image size:"
+	@stat -c %s flyos.img
+	qemu-system-i386 -drive format=raw,file=flyos.img
 
 clean:
-	rm -f $(TARGET)
+	rm -f mbr.bin stage1.bin flyos.img

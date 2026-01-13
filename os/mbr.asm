@@ -73,6 +73,8 @@ read_sectors:
     dec di
     jnz .retry
 
+    stc ; Set carry flag to indicate error
+
 .done:
     ret
 

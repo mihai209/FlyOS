@@ -23,7 +23,7 @@ Legend:
 
 | Step | Task                 | Status |
 | ---: | -------------------- | ------ |
-|    1 | Enable A20           | 🔲     |
+|    1 | Enable A20           | ✅     |
 |    2 | Temporary GDT        | 🔲     |
 |    3 | Disable interrupts   | 🔲     |
 |    4 | Enter protected mode | 🔲     |

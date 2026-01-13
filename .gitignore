@@ -1,3 +1,4 @@
 build
-flyos.iso
+*.iso
 *.bin
+*.img

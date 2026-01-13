@@ -13,8 +13,8 @@ Legend:
 | ---: | ------------------- | ------ |
 |    1 | 512B MBR @ `0x7C00` | ✅     |
 |    2 | Stack setup         | ✅     |
-|    3 | Clear screen        | 🔲     |
-|    4 | Print boot text     | 🔲     |
+|    3 | Clear screen        | ✅    |
+|    4 | Print boot text     | ✅     |
 |    5 | Disk read (INT 13h) | 🔲     |
 
 ---

@@ -1,20 +1,24 @@
 ; FlyOS MBR
-; Runs at 0x7C00
+; Step 2: Proper stack setup
 ; ASM ONLY
 
 BITS 16
 ORG 0x7C00
 
 start:
-    cli                 ; disable interrupts
+    cli
+
     xor ax, ax
     mov ds, ax
     mov es, ax
+
+    ; --- STACK SETUP ---
     mov ss, ax
-    mov sp, 0x7C00      ; simple stack
+    mov sp, 0x9000     ; safe stack (below EBDA, above MBR)
+
     sti
 
-    ; Clear screen (text mode)
+    ; Clear screen
     mov ax, 0x0003
     int 0x10
 
@@ -22,11 +26,11 @@ start:
     mov si, boot_msg
 .print:
     lodsb
-    or al, al
+    test al, al
     jz .hang
-    mov ah, 0x0E        ; teletype output
+    mov ah, 0x0E
     mov bh, 0x00
-    mov bl, 0x07        ; light gray
+    mov bl, 0x07
     int 0x10
     jmp .print
 
@@ -35,10 +39,7 @@ start:
     hlt
     jmp .hang
 
-boot_msg db "FlyOS MBR booted", 0
+boot_msg db "FlyOS MBR stack OK", 0
 
-; Pad to 510 bytes
 times 510-($-$$) db 0
-
-; Boot signature
 dw 0xAA55

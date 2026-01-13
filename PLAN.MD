@@ -25,8 +25,8 @@ Legend:
 | ---: | -------------------- | ------ |
 |    1 | Enable A20           | ✅     |
 |    2 | GDT                  | ✅     |
-|    3 | Disable interrupts   | 🔲     |
-|    4 | Enter protected mode | 🔲     |
+|    3 | Disable interrupts   | ✅     |
+|    4 | Enter protected mode | ✅     |
 |    5 | Jump to Stage 2      | 🔲     |
 
 ---

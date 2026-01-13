@@ -1,0 +1,15 @@
+{
+  "name": "flyos",
+  "scripts": {
+    "build": "make clean ; sleep 1 ; make ; sleep 1 ; make run",
+    "debug": "clear ; qemu-system-i386 -drive file=flyos.img,format=raw -no-reboot -d int",
+    "hexdump": "hexdump -C flyos.img | less",
+    "rmnix": "rm -rf /nix ~/.nix-profile ~/.nix-defexpr ~/.nix-channels",
+    "shell": "nix-shell",
+    "nix-install": "sh <(curl -L https://nixos.org/nix/install) --no-daemon",
+    "nix-bashrc": "echo '. ~/.nix-profile/etc/profile.d/nix.sh' >> ~/.bashrc"
+  },
+  "keywords": [],
+  "author": "Mihai209",
+  "license": "ISC"
+}

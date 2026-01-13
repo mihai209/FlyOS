@@ -1,4 +1,3 @@
-; BOOT.ASM — HDD MBR bootloader
 BITS 16
 ORG 0x7C00
 
@@ -11,50 +10,24 @@ start:
     mov sp, 0x7C00
     sti
 
-    mov [boot_drive], dl   ; BIOS ne dă drive-ul corect (0x80)
+    mov bx, 0x8000        ; load address
+    mov dh, 4             ; sectors
+    call load_stage2
 
-    mov si, msg_boot
-    call print
+    jmp 0x0000:0x8000     ; jump to C bootloader
 
-    ; Disk Address Packet (DAP)
-    mov si, dap
-    mov ah, 0x42           ; INT 13h Extensions - Read
-    mov dl, [boot_drive]
+load_stage2:
+    pusha
+    mov ah, 0x02
+    mov al, dh
+    mov ch, 0
+    mov cl, 2
+    mov dh, 0
+    mov dl, 0x80
     int 0x13
-    jc disk_error
-
-    jmp 0x0000:0x1000
-
-disk_error:
-    mov si, msg_err
-    call print
-    hlt
-
-print:
-    lodsb
-    test al, al
-    jz .done
-    mov ah, 0x0E
-    int 0x10
-    jmp print
-.done:
+    jc $
+    popa
     ret
 
-boot_drive db 0
-
-msg_boot db "FlyOS HDD boot...", 0
-msg_err  db "Disk read error", 0
-
-; -------------------------
-; Disk Address Packet
-; -------------------------
-dap:
-    db 0x10        ; size of DAP
-    db 0x00
-    dw 4           ; sectors to read (adjust if loader grows)
-    dw 0x1000      ; offset
-    dw 0x0000      ; segment
-    dq 1           ; LBA start (sector 1 = after MBR)
-
-times 510 - ($ - $$) db 0
+times 510-($-$$) db 0
 dw 0xAA55

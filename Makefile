@@ -1,20 +1,18 @@
 ASM = nasm
+QEMU = qemu-system-i386
 
-all: flyos.img
+BOOT = BOOT.ASM
+IMG  = flyos.img
 
-boot.bin: BOOT.ASM
-	$(ASM) -f bin BOOT.ASM -o boot.bin
+all: $(IMG)
 
-loader.bin: LOADER.ASM
-	$(ASM) -f bin LOADER.ASM -o loader.bin
+$(IMG): $(BOOT)
+	$(ASM) -f bin $(BOOT) -o boot.bin
+	dd if=/dev/zero of=$(IMG) bs=512 count=2880
+	dd if=boot.bin of=$(IMG) bs=512 count=1 conv=notrunc
 
-flyos.img: boot.bin loader.bin
-	dd if=/dev/zero of=flyos.img bs=512 count=32768
-	dd if=boot.bin of=flyos.img conv=notrunc
-	dd if=loader.bin of=flyos.img bs=512 seek=1 conv=notrunc
-
-run:
-	qemu-system-i386 -drive file=flyos.img,format=raw,index=0,media=disk
+run: $(IMG)
+	$(QEMU) -drive file=$(IMG),format=raw,index=0,media=disk
 
 clean:
 	rm -f *.bin *.img

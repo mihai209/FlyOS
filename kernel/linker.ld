@@ -1,10 +1,11 @@
-ENTRY(bootloader_entry)
+ENTRY(start)
 
-SECTIONS {
-    . = 0x8000;
+SECTIONS
+{
+    . = 0x00100000;
 
     .text : { *(.text*) }
     .rodata : { *(.rodata*) }
     .data : { *(.data*) }
-    .bss : { *(.bss*) }
+    .bss : { *(.bss*) *(COMMON) }
 }

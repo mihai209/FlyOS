@@ -1,8 +1,9 @@
 {
   "name": "flyos",
   "scripts": {
-    "build": "make clean ; sleep 1 ; make ; sleep 1 ; make run",
-    "debug": "clear ; qemu-system-i386 -drive file=flyos.img,format=raw -no-reboot -d int",
+    "build": "clear ; make clean ; sleep 1 ; make ; sleep 1 ; make run",
+    "debug": "clear ; qemu-system-i386 -drive file=flyos.iso,media=cdrom,readonly=on -boot d -no-reboot -d int",
+    "debug1": "clear ; qemu-system-i386 -cdrom flyos.iso -no-reboot",
     "hexdump": "hexdump -C flyos.img | less",
     "rmnix": "rm -rf /nix ~/.nix-profile ~/.nix-defexpr ~/.nix-channels",
     "shell": "nix-shell",

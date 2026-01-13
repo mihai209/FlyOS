@@ -1,5 +1,8 @@
-void kernel_entry(void) {
-    while (1) {
-        __asm__ volatile ("hlt");
-    }
+#include <stdio.h>
+
+void kmain(void)
+{
+    vga_clear();
+    vga_write("FlyOS kernel alive\n");
+    for (;;);
 }

@@ -1,9 +1,9 @@
-#include "stdio.h"
+#include "lib/vga.h"
 
-void kmain(void)
-{
+void kernel_main(void) {
     vga_clear();
-    printf("FlyOS El Torito boot OK\n");
+    vga_puts("FlyOS booted successfully.\n");
+    vga_puts("Minimal kernel online.");
 
     for (;;)
         __asm__ volatile ("hlt");

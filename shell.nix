@@ -2,9 +2,10 @@
 
 pkgs.mkShell {
   buildInputs = [
+    pkgs.pkgsCross.i686-embedded.buildPackages.gcc
+    pkgs.pkgsCross.i686-embedded.buildPackages.binutils
     pkgs.nasm
     pkgs.qemu
-    pkgs.binutils
-    pkgs.gnumake
+    pkgs.cdrtools
   ];
 }

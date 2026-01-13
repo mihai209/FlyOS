@@ -1,94 +1,34 @@
-# =========================
-# FlyOS – El Torito ISO
-# =========================
+AS = nasm
+CC = i686-elf-gcc
+LD = i686-elf-ld
 
-ARCH      := i386
-CC        := gcc
-LD        := ld
-AS        := nasm
-OBJCOPY   := objcopy
+CFLAGS = -ffreestanding -O2 -Wall -Wextra -fno-pic -fno-stack-protector
+LDFLAGS = -T kernel/linker.ld -nostdlib
 
-CFLAGS    := -m32 -ffreestanding -fno-pic -fno-stack-protector \
-             -fno-builtin -nostdlib -nostartfiles -nodefaultlibs \
-             -nostdinc -Ikernel/lib \
-             -Wall -Wextra -O2
-
-LDFLAGS   := -m elf_i386 -nostdlib
-
-ISO       := flyos.iso
-BOOTBIN   := boot.bin
-KERNELELF := kernel.elf
-
-
-# =========================
-# Obiecte
-# =========================
-
-ASM_OBJS := boot/eltorito.o
-C_OBJS   := kernel/main.o kernel/lib/stdio.o
-
-OBJS := $(ASM_OBJS) $(C_OBJS)
-
-# =========================
-# Target-uri
-# =========================
+ISO = flyos.iso
 
 all: $(ISO)
 
-clean:
-	rm -f $(OBJS) $(KERNELELF) $(BOOTBIN) $(ISO)
-	rm -rf iso
+dirs:
+	mkdir -p iso/boot
+
+boot.bin: dirs
+	$(AS) -f bin kernel/boot/boot.asm -o boot.bin
+
+kernel.bin:
+	$(AS) -f elf32 kernel/boot/main.asm -o kboot.o
+	$(CC) $(CFLAGS) -c kernel/lib/vga.c -o vga.o
+	$(CC) $(CFLAGS) -c kernel/main.c -o kmain.o
+	$(LD) $(LDFLAGS) kboot.o vga.o kmain.o -o kernel.bin
+
+$(ISO): boot.bin kernel.bin
+	cp boot.bin iso/boot/boot.bin
+	cp kernel.bin iso/boot/kernel.bin
+	mkisofs -R -b boot/boot.bin -no-emul-boot -boot-load-size 4 -o $(ISO) iso
 
 run: $(ISO)
-	qemu-system-i386 -cdrom $(ISO) -boot d -no-reboot
+	qemu-system-i386 -cdrom $(ISO)
 
-debug: $(ISO)
-	clear
-	qemu-system-i386 -cdrom $(ISO) -boot d -no-reboot -d int
-
-# =========================
-# ASM
-# =========================
-
-boot/eltorito.o: boot/eltorito.asm
-	$(AS) -f elf32 $< -o $@
-
-# =========================
-# C
-# =========================
-
-kernel/main.o: kernel/main.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-kernel/lib/stdio.o: kernel/lib/stdio.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# =========================
-# Link
-# =========================
-
-$(KERNELELF): $(OBJS) kernel/linker.ld
-	$(LD) $(LDFLAGS) -T kernel/linker.ld $(OBJS) -o $@
-
-# =========================
-# Binary El Torito
-# =========================
-
-$(BOOTBIN): $(KERNELELF)
-	$(OBJCOPY) -O binary $(KERNELELF) $@
-	truncate -s 2048 $@
-
-# =========================
-# ISO
-# =========================
-
-$(ISO): $(BOOTBIN)
-	mkdir -p iso
-	cp $(BOOTBIN) iso/boot.bin
-	mkisofs -quiet \
-		-b boot.bin \
-		-no-emul-boot \
-		-boot-load-size 4 \
-		-boot-info-table \
-		-o $(ISO) iso
+clean:
+	rm -f *.o *.bin $(ISO)
 	rm -rf iso

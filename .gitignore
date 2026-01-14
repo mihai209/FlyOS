@@ -6,3 +6,4 @@ plan.md
 *.bin
 *.elf
 *.o
+*.gitconf

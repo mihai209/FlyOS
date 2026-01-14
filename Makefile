@@ -30,10 +30,14 @@ BUILD := build
 # =========================
 OBJS := \
 	$(BUILD)/start.o \
+	$(BUILD)/kernel.o \
 	$(BUILD)/gdt.o \
 	$(BUILD)/gdt_load.o \
 	$(BUILD)/tss.o \
-	$(BUILD)/kernel.o
+	$(BUILD)/idt.o \
+	$(BUILD)/idt_load.o \
+	$(BUILD)/exceptions.o \
+	$(BUILD)/isr_stubs.o
 
 
 # =========================
@@ -66,6 +70,30 @@ $(BUILD)/tss.o: gdt/tss.c | $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD)/gdt_load.o: gdt/gdt_load.S | $(BUILD)
+	$(CC) -c $< -o $@
+
+$(BUILD)/idt.o: idt/idt.c | $(BUILD)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/idt_load.o: idt/idt_load.S | $(BUILD)
+	$(CC) -c $< -o $@
+
+$(BUILD)/exceptions.o: idt/exceptions.c | $(BUILD)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/isr_stubs.o: idt/isr_stubs.S | $(BUILD)
+	$(CC) -c $< -o $@
+
+# =========================
+# Clean
+# =========================
+clean:
+	rm -rf $(BUILD) kernel.elf
+
+$(BUILD)/exceptions.o: idt/exceptions.c | $(BUILD)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/isr_stubs.o: idt/isr_stubs.S | $(BUILD)
 	$(CC) -c $< -o $@
 
 # =========================

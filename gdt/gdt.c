@@ -33,9 +33,11 @@ static struct {
     struct gdt_tss_entry tss;
 } gdt;
 
-static struct gdt_ptr gdtr;
+/* Pointerul GDT, vizibil global pentru a fi accesat din gdt_load.S */
+struct gdt_ptr gdt_ptr;
 
-extern void gdt_load(struct gdt_ptr*);
+/* Prototipul funcției definite în gdt_load.S */
+extern void gdt_load(void);
 
 static void gdt_set_entry(struct gdt_entry* e, uint8_t access)
 {
@@ -64,8 +66,8 @@ void gdt_init(void)
     gdt.tss.base_upper = (base >> 32);
     gdt.tss.reserved = 0;
 
-    gdtr.limit = sizeof(gdt) - 1;
-    gdtr.base  = (uint64_t)&gdt;
+    gdt_ptr.limit = sizeof(gdt) - 1;
+    gdt_ptr.base  = (uint64_t)&gdt;
 
-    gdt_load(&gdtr);
+    gdt_load();
 }

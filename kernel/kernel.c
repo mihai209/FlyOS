@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "../gdt/gdt.h"
 #include "../gdt/tss.h"
+#include "../idt/idt.h"
 
 /*
  * Stack-ul kernelului.
@@ -8,7 +9,7 @@
  * Mai târziu: per-CPU.
  */
 __attribute__((aligned(16)))
-static uint8_t kernel_stack[64 * 1024];
+uint8_t kernel_stack[64 * 1024];
 
 static inline void cpu_halt(void)
 {
@@ -32,6 +33,7 @@ void kernel_main(void)
      */
     tss_init(stack_top);
     gdt_init();
+    idt_init();
 
     /*
      * De aici înainte:
@@ -39,8 +41,12 @@ void kernel_main(void)
      * – TSS este încărcat
      * – IST este pregătit
      *
-     * Kernelul este într-o stare deterministă.
+     * Kernelul este într-o stare deterministă și poate primi întreruperi.
      */
+
+    /* Test pentru a genera o excepție - Division by Zero */
+    /* __asm__ volatile ("int $0"); */
+    /* __asm__ volatile ("div %bl" :: "a"(1), "b"(0)); */
 
     cpu_halt();
 }

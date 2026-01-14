@@ -1,3 +1,6 @@
+/* Marcăm stiva ca non-executabilă */
+.section .note.GNU-stack,"",@progbits
+
 /*
  * Header Multiboot 2 pentru FlyOS
  * Acesta trebuie să fie în primii 32KB ai kernel-ului.
@@ -29,12 +32,15 @@ multiboot_header_end:
  */
 .section .text
 .global _start
-_start:
-    /*
-     * Aici adaugi codul tău de inițializare.
-     * De exemplu, inițializarea GDT, IDT, etc.
-     */
+.extern kernel_main
+.extern kernel_stack
 
-    /* O buclă infinită pentru a opri procesorul momentan */
+_start:
+    /* Oprim întreruperile până când IDT este gata */
     cli
-    hlt
+
+    /* Setăm stack pointer-ul la vârful stivei definite în kernel.c */
+    movq $(kernel_stack + 64 * 1024), %rsp
+
+    /* Salt la funcția principală a kernel-ului */
+    call kernel_main

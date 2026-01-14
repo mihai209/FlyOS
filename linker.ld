@@ -4,7 +4,6 @@ ENTRY(_start)
 
 SECTIONS
 {
-    /* GRUB încarcă kernelul unde vrea; nu forțăm VMA exotic */
     . = 1M;
     _kernel_start = .;
 
@@ -12,28 +11,27 @@ SECTIONS
     {
         KEEP(*(.multiboot_header))
         *(.text .text.*)
-    }
+    } 
 
-    .rodata : ALIGN(16)
+    .rodata : ALIGN(4K)
     {
         *(.rodata .rodata.*)
-    }
+    } 
 
-    .data : ALIGN(16)
+    .data : ALIGN(4K)
     {
         *(.data .data.*)
-    }
+    } 
 
-    .bss : ALIGN(16)
+    .bss : ALIGN(4K)
     {
         *(COMMON)
         *(.bss .bss.*)
-    }
+    } 
 
     /DISCARD/ :
     {
         *(.eh_frame)
         *(.comment)
-        *(.note*)
-    }
+    } 
 }

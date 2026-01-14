@@ -2,9 +2,11 @@
     "name": "flyos",
     "license": "BSD-3-Clause",
     "scripts": {
+        "build": "clear ; make clean ; make",
         "readk" : "readelf -h kernel.elf",
         "isomake" : "grub-mkrescue -o flyos.iso .",
-        "cpk" : "cp kernel.elf boot/"
+        "cpk" : "cp kernel.elf boot/",
+        "all": "clear ; make clean ; make ; cp kernel.elf iso/boot/ ; grub-mkrescue -o flyos.iso iso"
     },
     "author": "Mihai209"
 }

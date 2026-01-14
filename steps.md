@@ -1,121 +1,175 @@
-Legendă:
-[ ] neimplementat
-[x] implementat / stabil
-[~] parțial / experimental
+# 🧭 Roadmap OS UEFI (C-centric, asm izolat)
 
-PHASE 0 — Mediu și toolchain (o singură dată)
+## Legendă
 
- Instalare clang (x86_64-elf sau clang freestanding)
- Instalare lld
- Instalare GNU binutils (pentru objdump, nm)
- Instalare QEMU cu OVMF (UEFI)
- Structură proiect creată (boot/ kernel/ user/)
- Build system (Makefile sau Ninja) funcțional
- Script de rulare QEMU cu OVMF
+* `[ ]` neimplementat
+* `[x]` implementat / stabil
+* `[~]` parțial / experimental
 
-PHASE 1 — Boot UEFI (C ONLY)
+---
 
- Aplicație EFI (BOOTX64.EFI) pornește în QEMU
- Print text pe ecran prin UEFI Console
- Acces la GOP (Graphics Output Protocol)
- Obținere framebuffer (base, width, height, pitch)
- Obținere memory map UEFI
- Alocare memorie cu AllocatePages
- Încărcare kernel ELF din disk
- Pregătire structură boot_info
- ExitBootServices reușit
- Jump în kernel entry
+## PHASE 0 — Mediu și toolchain (o singură dată)
 
-PHASE 2 — ASM MINIMAL (OBLIGATORIU, IZOLAT)
+| Status | Task                         | Detalii / Criteriu de acceptare                       |
+| ------ | ---------------------------- | ----------------------------------------------------- |
+| [ ]    | Instalare clang freestanding | `clang --target=x86_64-elf -ffreestanding` funcțional |
+| [ ]    | Instalare lld                | Linkare ELF fără GNU ld                               |
+| [ ]    | Instalare GNU binutils       | `objdump`, `nm`, `readelf` disponibile                |
+| [ ]    | Instalare QEMU + OVMF        | Boot UEFI funcțional în QEMU                          |
+| [ ]    | Structură proiect            | `boot/ kernel/ user/ tools/`                          |
+| [ ]    | Build system                 | `make all` sau `ninja` fără erori                     |
+| [ ]    | Script QEMU                  | Boot automat cu OVMF + disk FAT                       |
 
- kernel_entry.S
- Stack setat manual
- Interrupts dezactivate (cli)
- Jump controlat în kernel_main()
- Loop de siguranță (hlt) dacă kernelul iese
+---
 
-PHASE 3 — Kernel Core (C ONLY)
+## PHASE 1 — Boot UEFI (C ONLY)
 
- Kernel pornește și rulează kernel_main
- Print debug pe framebuffer
- Paging propriu inițializat (PML4)
- Identity map eliminat
- Allocator de pagini funcțional
- Heap kernel minimal
- GDT configurat
- IDT configurat
- Timer funcțional (PIT sau APIC)
- Panic handler determinist
+| Status | Task                 | Detalii / Criteriu de acceptare     |
+| ------ | -------------------- | ----------------------------------- |
+| [ ]    | BOOTX64.EFI pornește | Rulează ca aplicație EFI            |
+| [ ]    | Print text UEFI      | `SystemTable->ConOut->OutputString` |
+| [ ]    | Acces GOP            | GOP detectat corect                 |
+| [ ]    | Framebuffer info     | Base, width, height, pitch valide   |
+| [ ]    | Memory map UEFI      | Obținut înainte de ExitBootServices |
+| [ ]    | AllocatePages        | Alocare pagini kernel               |
+| [ ]    | Load kernel ELF      | ELF64 parse + segmente încărcate    |
+| [ ]    | boot_info            | Structură pregătită și populată     |
+| [ ]    | ExitBootServices     | Reușit fără fallback                |
+| [ ]    | Jump kernel          | Control transferat corect           |
 
-PHASE 4 — Interrupts & Scheduling (asm doar pentru stubs)
+---
 
- ISR stubs în asm
- Handler C pentru interrupts
- Context save/restore corect
- Scheduler simplu (round-robin)
- Task kernel threads
- Trecere controlată între task-uri
+## PHASE 2 — ASM MINIMAL (OBLIGATORIU, IZOLAT)
 
-PHASE 5 — Framebuffer Driver (Kernel, C)
+| Status | Task             | Detalii / Criteriu de acceptare |
+| ------ | ---------------- | ------------------------------- |
+| [ ]    | `kernel_entry.S` | Un singur fișier asm            |
+| [ ]    | Stack setat      | `rsp` inițializat manual        |
+| [ ]    | Interrupts off   | `cli` executat                  |
+| [ ]    | Jump kernel_main | ABI clar definit                |
+| [ ]    | Safety loop      | `hlt` dacă kernelul revine      |
 
- Map framebuffer fizic → virtual
- putpixel
- fill_rect
- blit
- Double buffering
- Clear screen
- Driver stabil (fără flicker)
+---
 
-PHASE 6 — Input (Kernel, C)
+## PHASE 3 — Kernel Core (C ONLY)
 
- Driver tastatură PS/2 sau USB HID
- Driver mouse
- Evenimente normalizate (key, mouse)
- Queue de evenimente
- Trimitere evenimente prin IPC
+| Status | Task                | Detalii / Criteriu de acceptare |
+| ------ | ------------------- | ------------------------------- |
+| [ ]    | kernel_main rulează | Control stabil                  |
+| [ ]    | Debug framebuffer   | Text fără UEFI                  |
+| [ ]    | Paging propriu      | PML4 creat de kernel            |
+| [ ]    | No identity map     | Kernel rulează high-half        |
+| [ ]    | Page allocator      | Bitmap / freelist funcțional    |
+| [ ]    | Heap kernel         | `kmalloc/kfree` minimal         |
+| [ ]    | GDT                 | Segmente curate                 |
+| [ ]    | IDT                 | Intrări valide                  |
+| [ ]    | Timer               | PIT sau APIC ticks              |
+| [ ]    | Panic handler       | Determinist, fără UB            |
 
-PHASE 7 — IPC & Userland (C ONLY)
+---
 
- Separare kernel / userland
- ELF loader userland
- Procese user
- IPC prin mesaje (copy sau shared)
- Syscall ABI stabil
- Server de evenimente input
+## PHASE 4 — Interrupts & Scheduling
 
-PHASE 8 — Compositor / GUI Server (Userland, C)
+| Status | Task             | Detalii / Criteriu de acceptare |
+| ------ | ---------------- | ------------------------------- |
+| [ ]    | ISR stubs asm    | Doar entry/exit                 |
+| [ ]    | Handler C        | Logică în C                     |
+| [ ]    | Context save     | Registre + flags                |
+| [ ]    | Scheduler RR     | Determinist                     |
+| [ ]    | Kernel threads   | Stivă per task                  |
+| [ ]    | Switch controlat | Fără corupție                   |
 
- Proces GUI dedicat
- Backbuffer per fereastră
- Alpha blending
- Z-order
- Redraw invalidation
- Mouse cursor software
- Clipboard (opțional)
+---
 
-PHASE 9 — Toolkit GUI (C)
+## PHASE 5 — Framebuffer Driver (Kernel, C)
 
- Sistem de widget-uri
- Buton
- Label
- Window
- Event dispatch
- Layout simplu
- Font bitmap (PSF)
+| Status | Task           | Detalii / Criteriu de acceptare |
+| ------ | -------------- | ------------------------------- |
+| [ ]    | FB map virtual | MMU corect                      |
+| [ ]    | putpixel       | Fără tearing                    |
+| [ ]    | fill_rect      | Corect și rapid                 |
+| [ ]    | blit           | Memcpy optim                    |
+| [ ]    | Double buffer  | Elimină flicker                 |
+| [ ]    | Clear screen   | O(wh)                           |
+| [ ]    | Driver stabil  | Fără glitch-uri                 |
 
-PHASE 10 — Desktop Minimal
+---
 
- Desktop manager
- Taskbar minimal
- Launcher aplicații
- Aplicație demo GUI
- Shutdown / reboot
+## PHASE 6 — Input (Kernel, C)
 
-PHASE 11 — Hardening & Cleanup
+| Status | Task        | Detalii / Criteriu de acceptare |
+| ------ | ----------- | ------------------------------- |
+| [ ]    | Tastatură   | PS/2 sau USB HID                |
+| [ ]    | Mouse       | Evenimente relative             |
+| [ ]    | Normalizare | Key/mouse events                |
+| [ ]    | Event queue | Lock-free sau spin              |
+| [ ]    | IPC input   | Trimis către userland           |
 
- Cod auditat
- Zero UB (undefined behavior)
- Stack guards
- Kernel panic reproductibil
- Build reproducibil
- Documentație internă
+---
+
+## PHASE 7 — IPC & Userland (C ONLY)
+
+| Status | Task           | Detalii / Criteriu de acceptare |
+| ------ | -------------- | ------------------------------- |
+| [ ]    | Separare ring3 | User ≠ kernel                   |
+| [ ]    | ELF loader     | Procese user                    |
+| [ ]    | Procese        | Address space propriu           |
+| [ ]    | IPC mesaje     | Copy sau shared                 |
+| [ ]    | Syscall ABI    | Stabil, documentat              |
+| [ ]    | Input server   | Userland daemon                 |
+
+---
+
+## PHASE 8 — Compositor / GUI Server (Userland, C)
+
+| Status | Task            | Detalii / Criteriu de acceptare |
+| ------ | --------------- | ------------------------------- |
+| [ ]    | GUI process     | Single authority                |
+| [ ]    | Backbuffer      | Per fereastră                   |
+| [ ]    | Alpha blending  | Corect                          |
+| [ ]    | Z-order         | Determinist                     |
+| [ ]    | Invalidation    | Redraw minim                    |
+| [ ]    | Cursor software | Fără hardware                   |
+| [ ]    | Clipboard       | Opțional                        |
+
+---
+
+## PHASE 9 — Toolkit GUI (C)
+
+| Status | Task           | Detalii / Criteriu de acceptare |
+| ------ | -------------- | ------------------------------- |
+| [ ]    | Widget system  | Fără RTTI                       |
+| [ ]    | Button         | Click events                    |
+| [ ]    | Label          | Text static                     |
+| [ ]    | Window         | Focus + move                    |
+| [ ]    | Event dispatch | Bubbling                        |
+| [ ]    | Layout         | Simplu                          |
+| [ ]    | Font PSF       | Bitmap                          |
+
+---
+
+## PHASE 10 — Desktop Minimal
+
+| Status | Task            | Detalii / Criteriu de acceptare |
+| ------ | --------------- | ------------------------------- |
+| [ ]    | Desktop manager | Root window                     |
+| [ ]    | Taskbar         | Minimal                         |
+| [ ]    | Launcher        | Exec apps                       |
+| [ ]    | Demo GUI app    | Showcase                        |
+| [ ]    | Shutdown        | ACPI                            |
+| [ ]    | Reboot          | Corect                          |
+
+---
+
+## PHASE 11 — Hardening & Cleanup
+
+| Status | Task                | Detalii / Criteriu de acceptare     |
+| ------ | ------------------- | ----------------------------------- |
+| [ ]    | Audit cod           | Manual                              |
+| [ ]    | Zero UB             | Compilare cu `-fsanitize=undefined` |
+| [ ]    | Stack guards        | Canary sau shadow                   |
+| [ ]    | Panic reproductibil | State dump                          |
+| [ ]    | Build reproducibil  | Hash identic                        |
+| [ ]    | Documentație        | Internă, tehnică                    |
+
+

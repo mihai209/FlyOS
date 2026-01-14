@@ -1,7 +1,0 @@
-*.iso
-build/*
-*.bin
-*.img
-*.o
-*.elf
-.gitconf

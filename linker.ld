@@ -6,10 +6,10 @@ SECTIONS
 {
     /* GRUB încarcă kernelul unde vrea; nu forțăm VMA exotic */
     . = 1M;
+    _kernel_start = .;
 
-    .text : ALIGN(16)
+    .text : ALIGN(4K)
     {
-        KEEP(*(.multiboot))
         *(.text .text.*)
     }
 

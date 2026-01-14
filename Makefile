@@ -30,11 +30,10 @@ BUILD := build
 # =========================
 OBJS := \
 	$(BUILD)/start.o \
-	$(BUILD)/kernel.o \
-	$(BUILD)/multiboot.o \
 	$(BUILD)/gdt.o \
+	$(BUILD)/gdt_load.o \
 	$(BUILD)/tss.o \
-	$(BUILD)/gdt_load.o
+	$(BUILD)/kernel.o
 
 
 # =========================
@@ -68,9 +67,6 @@ $(BUILD)/tss.o: gdt/tss.c | $(BUILD)
 
 $(BUILD)/gdt_load.o: gdt/gdt_load.S | $(BUILD)
 	$(CC) -c $< -o $@
-
-$(BUILD)/multiboot.o: kernel/multiboot.c | $(BUILD)
-	$(CC) $(CFLAGS) -c $< -o $@
 
 # =========================
 # Clean

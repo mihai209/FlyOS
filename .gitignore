@@ -7,3 +7,4 @@ plan.md
 *.elf
 *.o
 *.gitconf
+setup.sh

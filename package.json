@@ -7,6 +7,6 @@
         "isomake" : "grub-mkrescue -o flyos.iso .",
         "cpk" : "cp kernel.elf boot/",
         "all": "clear ; make clean ; make ; cp kernel.elf iso/boot/ ; grub-mkrescue -o flyos.iso iso"
-    },
+               },
     "author": "Mihai209"
 }

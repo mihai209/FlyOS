@@ -37,7 +37,11 @@ OBJS := \
 	$(BUILD)/idt.o \
 	$(BUILD)/idt_load.o \
 	$(BUILD)/exceptions.o \
-	$(BUILD)/isr_stubs.o
+	$(BUILD)/isr_stubs.o \
+	$(BUILD)/panic.o \
+	$(BUILD)/pic.o \
+	$(BUILD)/irq.o \
+	$(BUILD)/timer_kbd.o
 
 
 # =========================
@@ -78,23 +82,23 @@ $(BUILD)/idt.o: idt/idt.c | $(BUILD)
 $(BUILD)/idt_load.o: idt/idt_load.S | $(BUILD)
 	$(CC) -c $< -o $@
 
-$(BUILD)/exceptions.o: idt/exceptions.c | $(BUILD)
-	$(CC) $(CFLAGS) -c $< -o $@
-
 $(BUILD)/isr_stubs.o: idt/isr_stubs.S | $(BUILD)
 	$(CC) -c $< -o $@
 
-# =========================
-# Clean
-# =========================
-clean:
-	rm -rf $(BUILD) kernel.elf
-
-$(BUILD)/exceptions.o: idt/exceptions.c | $(BUILD)
+$(BUILD)/panic.o: panic/panic.c panic/panic.h | $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD)/isr_stubs.o: idt/isr_stubs.S | $(BUILD)
-	$(CC) -c $< -o $@
+$(BUILD)/exceptions.o: idt/exceptions.c idt/isr.h | $(BUILD)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/pic.o: irq/pic.c irq/pic.h | $(BUILD)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/irq.o: irq/irq.c irq/irq.h irq/pic.h idt/isr.h | $(BUILD)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/timer_kbd.o: irq/timer_kbd.c irq/irq.h idt/isr.h | $(BUILD)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # =========================
 # Clean

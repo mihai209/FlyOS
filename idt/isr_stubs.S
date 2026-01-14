@@ -29,7 +29,8 @@ isr\int_no:
  
 /* Stub-ul comun pentru toate ISR-urile */
 isr_common_stub:
-    // Salvează toți registrii generali
+    // Salvează toți registrii generali în ordinea inversă a structurii registers_t
+    // pentru a se potrivi cu layout-ul din memorie.
     pushq %rax
     pushq %rbx
     pushq %rcx
@@ -37,7 +38,6 @@ isr_common_stub:
     pushq %rbp
     pushq %rsi
     pushq %rdi
-    pushq %rbx
     pushq %r8
     pushq %r9
     pushq %r10
@@ -59,10 +59,12 @@ isr_common_stub:
     popq %r10
     popq %r9
     popq %r8
-    popq %rbx
-    popq %rbp
-    popq %rsi
     popq %rdi
+    popq %rsi
+    popq %rbp
+    popq %rdx
+    popq %rcx
+    popq %rbx
     popq %rax
  
     addq $16, %rsp  // Curăță de pe stivă numărul întreruperii și codul de eroare

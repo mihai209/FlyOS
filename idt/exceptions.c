@@ -1,5 +1,7 @@
 #include "isr.h"
- 
+#include "../irq/irq.h" // Pentru a apela dispatcher-ul IRQ
+#include "../panic/panic.h"
+
 // Un array de string-uri cu mesajele excepțiilor
 const char *exception_messages[] = {
     "Division By Zero", "Debug", "Non Maskable Interrupt", "Breakpoint",
@@ -11,22 +13,21 @@ const char *exception_messages[] = {
     "Reserved", "Reserved", "Reserved", "Reserved", "Reserved", "Reserved",
     "Triple Fault", "Reserved"
 };
- 
+
 /*
  * Handler-ul C general pentru toate întreruperile.
  * Este apelat din isr_common_stub.
  */
 void isr_handler(registers_t* regs) {
-    // Aici poți adăuga cod pentru a afișa pe ecran, de exemplu.
-    // Momentan, vom simula o panică.
-    if (regs->int_no < 32) {
-        // Afișează mesajul de excepție (necesită o funcție de printare)
-        // printk("Received interrupt: %d - %s\n", regs.int_no, exception_messages[regs.int_no]);
-        // printk("Error code: %x\n", regs.err_code);
-    }
- 
-    // Oprește sistemul
-    for (;;) {
-        asm volatile("cli; hlt");
+    // Verificăm dacă întreruperea este un IRQ hardware
+    if (regs->int_no >= 32 && regs->int_no <= 47) {
+        irq_dispatch(regs);
+    } else {
+        // Este o excepție a procesorului
+        if (regs->int_no < 32) {
+            kernel_panic(regs, exception_messages[regs->int_no]);
+        } else {
+            kernel_panic(regs, "Unknown Interrupt");
+        }
     }
 }

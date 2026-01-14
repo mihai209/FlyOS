@@ -2,6 +2,10 @@
 #include "../gdt/gdt.h"
 #include "../gdt/tss.h"
 #include "../idt/idt.h"
+#include "../irq/irq.h"
+
+// Prototip pentru funcția de inițializare a driverelor simple
+void timer_kbd_init(void);
 
 /*
  * Stack-ul kernelului.
@@ -34,6 +38,11 @@ void kernel_main(void)
     tss_init(stack_top);
     gdt_init();
     idt_init();
+    irq_init();
+
+    // Inițializează driverele de test
+    timer_kbd_init();
+    asm volatile("sti"); // Activează întreruperile
 
     /*
      * De aici înainte:
@@ -47,6 +56,7 @@ void kernel_main(void)
     /* Test pentru a genera o excepție - Division by Zero */
     /* __asm__ volatile ("int $0"); */
     /* __asm__ volatile ("div %bl" :: "a"(1), "b"(0)); */
+    /* __asm__ volatile ("ud2"); */
 
     cpu_halt();
 }

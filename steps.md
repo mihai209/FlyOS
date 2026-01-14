@@ -12,13 +12,13 @@
 
 | Status | Task                         | Detalii / Criteriu de acceptare                       |
 | ------ | ---------------------------- | ----------------------------------------------------- |
-| [ ]    | Instalare clang freestanding | `clang --target=x86_64-elf -ffreestanding` funcțional |
-| [ ]    | Instalare lld                | Linkare ELF fără GNU ld                               |
-| [ ]    | Instalare GNU binutils       | `objdump`, `nm`, `readelf` disponibile                |
-| [ ]    | Instalare QEMU + OVMF        | Boot UEFI funcțional în QEMU                          |
-| [ ]    | Structură proiect            | `boot/ kernel/ user/ tools/`                          |
-| [ ]    | Build system                 | `make all` sau `ninja` fără erori                     |
-| [ ]    | Script QEMU                  | Boot automat cu OVMF + disk FAT                       |
+| [x]    | Instalare clang freestanding | `clang --target=x86_64-elf -ffreestanding` funcțional |
+| [x]    | Instalare lld                | Linkare ELF fără GNU ld                               |
+| [x]    | Instalare GNU binutils       | `objdump`, `nm`, `readelf` disponibile                |
+| [x]    | Instalare QEMU + OVMF        | Boot UEFI funcțional în QEMU                          |
+| [x]    | Structură proiect            | `boot/ kernel/ user/ tools/`                          |
+| [x]    | Build system                 | `make all` sau `ninja` fără erori                     |
+| [x]    | Script QEMU                  | Boot automat cu OVMF + disk FAT                       |
 
 ---
 

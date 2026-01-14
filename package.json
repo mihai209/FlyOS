@@ -1,0 +1,10 @@
+{
+    "name": "flyos",
+    "license": "BSD-3-Clause",
+    "scripts": {
+        "readk" : "readelf -h kernel.elf",
+        "isomake" : "grub-mkrescue -o flyos.iso .",
+        "cpk" : "cp kernel.elf boot/"
+    },
+    "author": "Mihai209"
+}

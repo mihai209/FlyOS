@@ -4,4 +4,5 @@ plan.md
 *.img
 *.obj
 *.bin
-*.txt
+*.elf
+*.o
